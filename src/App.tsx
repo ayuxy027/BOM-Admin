@@ -21,9 +21,6 @@ const App = () => (
           <Route path="/users" element={<Users />} />
           <Route path="/accounts" element={<ComingSoon title="Account Management" />} />
           <Route path="/transactions" element={<ComingSoon title="Transaction Management" />} />
-          <Route path="/analytics" element={<ComingSoon title="Analytics & Reports" />} />
-          <Route path="/notifications" element={<ComingSoon title="Notifications" />} />
-          <Route path="/security" element={<ComingSoon title="Security Settings" />} />
           <Route path="/settings" element={<ComingSoon title="System Settings" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
