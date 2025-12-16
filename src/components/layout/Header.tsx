@@ -1,4 +1,4 @@
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
+import { Search, ChevronDown, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -12,11 +12,28 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useSidebarContext } from '@/context/SidebarContext';
 
-export function Header() {
+import { useNavigate } from 'react-router-dom';
+
+interface HeaderProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export function Header({ title, subtitle }: HeaderProps) {
   const { toggleSidebar } = useSidebarContext();
+  const navigate = useNavigate();
+  const sessionString = localStorage.getItem('adminSession');
+  const session = sessionString ? JSON.parse(sessionString) : null;
+  const adminName = session?.username || 'Admin User';
+  const adminInitials = adminName.substring(0, 2).toUpperCase();
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminSession');
+    navigate('/login');
+  };
 
   return (
-    <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
+    <header className="min-h-[4rem] py-2 bg-card border-b border-border flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -26,34 +43,23 @@ export function Header() {
         >
           <Menu className="h-5 w-5" />
         </Button>
-        
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search users, transactions..."
-            className="w-80 pl-10 bg-secondary/50 border-0 focus-visible:ring-1 focus-visible:ring-primary"
-          />
+        <div className="flex flex-col justify-center">
+          {title && <h1 className="text-xl font-semibold text-foreground leading-none">{title}</h1>}
+          {subtitle && <p className="text-sm text-muted-foreground hidden sm:block mt-1 leading-none">{subtitle}</p>}
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-muted-foreground" />
-          <span className="absolute top-1 right-1.5 w-2 h-2 bg-destructive rounded-full" />
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                  AD
+                  {adminInitials}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium">Admin User</p>
-                <p className="text-xs text-muted-foreground">Super Admin</p>
+                <p className="text-sm font-medium">{adminName}</p>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
             </Button>
@@ -61,11 +67,11 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Activity Log</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')}>
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Sign Out</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive" onClick={handleLogout}>Sign Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
