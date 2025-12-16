@@ -18,21 +18,7 @@ export function StatsCard({ title, value, change, icon: Icon, variant = 'default
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <p className="text-2xl font-bold text-card-foreground">{value}</p>
-          {change !== undefined && (
-            <div className="flex items-center gap-1">
-              <span
-                className={cn(
-                  'text-xs font-medium px-1.5 py-0.5 rounded',
-                  isPositive 
-                    ? 'text-success bg-success/10' 
-                    : 'text-destructive bg-destructive/10'
-                )}
-              >
-                {isPositive ? '+' : ''}{change}%
-              </span>
-              <span className="text-xs text-muted-foreground">vs last month</span>
-            </div>
-          )}
+
         </div>
         <div
           className={cn(
