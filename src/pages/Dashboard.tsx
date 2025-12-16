@@ -1,65 +1,37 @@
-import { Users, CreditCard, ArrowLeftRight, DollarSign } from 'lucide-react';
+import { Users, ArrowLeftRight } from 'lucide-react';
 import { StatsCard } from '@/components/dashboard/StatsCard';
-import { UserGrowthChart } from '@/components/dashboard/UserGrowthChart';
-import { TransactionChart } from '@/components/dashboard/TransactionChart';
-import { RecentActivity } from '@/components/dashboard/RecentActivity';
-import { AccountTypesPie } from '@/components/dashboard/AccountTypesPie';
-import { mockDashboardStats } from '@/data/mockData';
+import { useDashboardData } from '@/hooks/useDashboardData';
+import { LoadingAnimation } from '@/components/ui/LoadingAnimation';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function Dashboard() {
+  const { stats, loading, error } = useDashboardData();
+
+  if (loading) return <LoadingAnimation />;
+  if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
-      </div>
+    <DashboardLayout title="Dashboard" subtitle="Welcome back! Here's what's happening today.">
+      <div className="space-y-6">
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="Total Users"
-          value={mockDashboardStats.totalUsers.toLocaleString()}
-          change={mockDashboardStats.userGrowth}
-          icon={Users}
-          variant="primary"
-        />
-        <StatsCard
-          title="Active Users"
-          value={mockDashboardStats.activeUsers.toLocaleString()}
-          change={8.2}
-          icon={Users}
-          variant="default"
-        />
-        <StatsCard
-          title="Transactions"
-          value={mockDashboardStats.totalTransactions.toLocaleString()}
-          change={mockDashboardStats.transactionGrowth}
-          icon={ArrowLeftRight}
-          variant="default"
-        />
-        <StatsCard
-          title="Total Revenue"
-          value={`$${(mockDashboardStats.totalRevenue / 1000).toFixed(0)}K`}
-          change={15.3}
-          icon={DollarSign}
-          variant="accent"
-        />
-      </div>
-
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <UserGrowthChart />
-        <TransactionChart />
-      </div>
-
-      {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <RecentActivity />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            title="Total Users"
+            value={stats.totalUsers.toLocaleString()}
+            change={stats.userGrowth}
+            icon={Users}
+            variant="primary"
+          />
+          <StatsCard
+            title="Transactions"
+            value={stats.totalTransactions.toLocaleString()}
+            change={stats.transactionGrowth}
+            icon={ArrowLeftRight}
+            variant="default"
+          />
         </div>
-        <AccountTypesPie />
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
