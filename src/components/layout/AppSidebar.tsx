@@ -3,12 +3,10 @@ import {
   Users, 
   CreditCard, 
   ArrowLeftRight, 
-  BarChart3, 
   Settings, 
   ChevronLeft,
   ChevronRight,
-  Shield,
-  Bell
+  Shield
 } from 'lucide-react';
 import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { useSidebarContext } from '@/context/SidebarContext';
@@ -19,12 +17,9 @@ const navItems = [
   { icon: Users, label: 'Users', path: '/users' },
   { icon: CreditCard, label: 'Accounts', path: '/accounts' },
   { icon: ArrowLeftRight, label: 'Transactions', path: '/transactions' },
-  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-  { icon: Bell, label: 'Notifications', path: '/notifications' },
 ];
 
 const bottomItems = [
-  { icon: Shield, label: 'Security', path: '/security' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
