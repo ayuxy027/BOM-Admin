@@ -95,7 +95,8 @@ export default function TransactionsPage() {
         return transactions.filter(tx => {
             const matchesSearch =
                 (tx.narration || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (tx.transaction_id || '').toLowerCase().includes(searchQuery.toLowerCase());
+                (tx.transaction_id || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (tx.reference_number || '').toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesType = typeFilter === 'all' || tx.transaction_type === typeFilter;
             return matchesSearch && matchesType;

@@ -47,6 +47,7 @@ export interface Transaction {
   balance_after?: number;
   debit?: number | null;
   credit?: number | null;
+  reference_number?: string;
   created_at?: string;
 }
 

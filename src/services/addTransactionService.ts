@@ -98,7 +98,8 @@ export async function addTransaction(input: AddTransactionInput): Promise<AddTra
                 description: input.description || '', // Keep description empty if not provided
                 beneficiary_name: input.beneficiary_name,
                 category: input.category,
-                remarks: input.remarks
+                remarks: input.remarks,
+                reference_number: input.reference_number
             })
             .select()
             .single();
@@ -143,6 +144,10 @@ export function validateAddTransactionInput(input: Partial<AddTransactionInput>)
 
     if (!input.narration || input.narration.trim() === '') {
         errors.push('Narration is required');
+    }
+
+    if (!input.reference_number || input.reference_number.trim() === '') {
+        errors.push('Reference number is required');
     }
 
     return errors;

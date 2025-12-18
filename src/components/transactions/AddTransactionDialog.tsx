@@ -46,6 +46,7 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, d
                 narration: data.narration,
                 description: data.description,
                 beneficiary_name: data.beneficiary_name,
+                reference_number: data.reference_number,
                 status: 'success'
             });
 
@@ -109,6 +110,11 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, d
                     <div className="grid gap-2">
                         <Label>Narration <span className="text-destructive">*</span></Label>
                         <Input {...register('narration', { required: true })} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label>Refrence no <span className="text-destructive">*</span></Label>
+                        <Input {...register('reference_number', { required: true })} />
                     </div>
 
                     <div className="grid gap-2">

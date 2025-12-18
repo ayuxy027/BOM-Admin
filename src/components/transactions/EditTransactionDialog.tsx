@@ -33,6 +33,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange, onTrans
             setValue('narration', transaction.narration);
             setValue('beneficiary_name', transaction.beneficiary_name);
             setValue('transaction_type', transaction.transaction_type);
+            setValue('reference_number', transaction.reference_number);
         }
     }, [transaction, setValue]);
 
@@ -44,7 +45,8 @@ export function EditTransactionDialog({ transaction, open, onOpenChange, onTrans
                 description: data.description,
                 narration: data.narration,
                 beneficiary_name: data.beneficiary_name,
-                transaction_type: data.transaction_type as TransactionType
+                transaction_type: data.transaction_type as TransactionType,
+                reference_number: data.reference_number
             });
 
             if (!result.success) {
@@ -91,6 +93,11 @@ export function EditTransactionDialog({ transaction, open, onOpenChange, onTrans
                     <div className="grid gap-2">
                         <Label>Narration <span className="text-destructive">*</span></Label>
                         <Input {...register('narration', { required: true })} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label>Refrence no <span className="text-destructive">*</span></Label>
+                        <Input {...register('reference_number', { required: true })} />
                     </div>
 
                     <div className="grid gap-2">

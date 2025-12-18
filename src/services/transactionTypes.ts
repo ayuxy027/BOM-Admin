@@ -65,6 +65,7 @@ export interface AddTransactionInput {
     status?: TransactionStatus;
     category?: string;
     remarks?: string;
+    reference_number?: string;
 }
 
 // Input for editing a transaction
@@ -75,6 +76,7 @@ export interface EditTransactionInput {
     description?: string;
     beneficiary_name?: string;
     status?: TransactionStatus;
+    reference_number?: string;
 }
 
 // Result from balance calculation

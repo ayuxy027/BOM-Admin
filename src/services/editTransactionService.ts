@@ -131,6 +131,10 @@ export async function editTransaction(
             updateData.beneficiary_name = updates.beneficiary_name;
         }
 
+        if (updates.reference_number !== undefined) {
+            updateData.reference_number = updates.reference_number;
+        }
+
         // Only proceed if there's something to update
         if (Object.keys(updateData).length === 0) {
             return { success: true, requiresRecalculation: false };
@@ -203,6 +207,10 @@ export function validateEditTransactionInput(input: EditTransactionInput): strin
 
     if (input.narration !== undefined && input.narration.trim() === '') {
         errors.push('Narration cannot be empty');
+    }
+
+    if (input.reference_number !== undefined && input.reference_number.trim() === '') {
+        errors.push('Reference number cannot be empty');
     }
 
     return errors;
