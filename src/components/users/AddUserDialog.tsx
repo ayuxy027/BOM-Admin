@@ -57,7 +57,7 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
                     account_holder_name: data.account_holder_name,
                     account_type: data.account_type,
                     balance: parseFloat(data.balance),
-                    customer_id: `CUST_${Date.now()}`, // Simple generic ID generation
+                    customer_id: data.customer_id,
                     email: data.email,
                     mobile_number: data.mobile_number,
                     address: data.address,
@@ -69,6 +69,10 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
                     amount_on_hold: parseFloat(data.amount_on_hold || '0'),
                     monthly_average_balance: parseFloat(data.monthly_average_balance || '0'),
                     nominee_name: data.nominee_name,
+                    date_of_birth: data.date_of_birth,
+                    pan_number: data.pan_number,
+                    aadhar_number: data.aadhar_number,
+                    relation_with_nominee: data.relation_with_nominee,
                     account_open_date: data.account_open_date
                 });
 
@@ -137,6 +141,16 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
                     <div className="grid gap-2">
                         <Label htmlFor="account_holder_name">Full Name <span className="text-destructive">*</span></Label>
                         <Input id="account_holder_name" {...register('account_holder_name', { required: true })} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="customer_id">Customer ID <span className="text-destructive">*</span></Label>
+                        <Input
+                            id="customer_id"
+                            {...register('customer_id', { required: true })}
+                            className="font-mono"
+                            placeholder="e.g., CUST_12345"
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -214,12 +228,50 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="nominee_name">Nominee Name</Label>
-                            <Input id="nominee_name" {...register('nominee_name')} />
+                            <Label htmlFor="date_of_birth">Date of Birth</Label>
+                            <Input id="date_of_birth" type="date" {...register('date_of_birth')} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="account_open_date">Account Open Date <span className="text-destructive">*</span></Label>
                             <Input id="account_open_date" type="date" {...register('account_open_date', { required: true })} />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="pan_number">PAN Number</Label>
+                            <Input
+                                id="pan_number"
+                                {...register('pan_number')}
+                                className="font-mono uppercase"
+                                placeholder="ABCDE1234F"
+                                maxLength={10}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="aadhar_number">Aadhar Number</Label>
+                            <Input
+                                id="aadhar_number"
+                                {...register('aadhar_number')}
+                                className="font-mono"
+                                placeholder="1234 5678 9012"
+                                maxLength={12}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="nominee_name">Nominee Name</Label>
+                            <Input id="nominee_name" {...register('nominee_name')} />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="relation_with_nominee">Relation with Nominee</Label>
+                            <Input
+                                id="relation_with_nominee"
+                                {...register('relation_with_nominee')}
+                                placeholder="e.g., Spouse, Child, Parent"
+                            />
                         </div>
                     </div>
 

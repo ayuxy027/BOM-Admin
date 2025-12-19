@@ -26,6 +26,7 @@ export interface User {
   account_open_date?: string;
   ifsc_code?: string;
   branch_name?: string;
+  date_of_birth?: string;
   pan_number?: string;
   aadhar_number?: string;
   nominee_name?: string;

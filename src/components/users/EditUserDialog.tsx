@@ -28,10 +28,12 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
 
     useEffect(() => {
         if (user) {
+            setValue('account_number', user.account_number);
             setValue('username', user.username);
             setValue('mpin', user.mpin);
             setValue('status', user.status);
             setValue('account_holder_name', user.account_holder_name);
+            setValue('customer_id', user.customer_id);
             setValue('account_type', user.account_type);
             setValue('email', user.email);
             setValue('mobile_number', user.mobile_number);
@@ -48,6 +50,10 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
             setValue('branch_name', user.branch_name);
             setValue('account_open_date', user.account_open_date);
             setValue('nominee_name', user.nominee_name);
+            setValue('date_of_birth', user.date_of_birth);
+            setValue('pan_number', user.pan_number);
+            setValue('aadhar_number', user.aadhar_number);
+            setValue('relation_with_nominee', user.relation_with_nominee);
         }
     }, [user, setValue]);
 
@@ -58,6 +64,7 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
             const { error: userError } = await supabase
                 .from('users')
                 .update({
+                    account_number: data.account_number,
                     username: data.username,
                     mpin: data.mpin,
                     status: data.status
@@ -71,6 +78,7 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
                 .from('user_details')
                 .update({
                     account_holder_name: data.account_holder_name,
+                    customer_id: data.customer_id,
                     account_type: data.account_type,
                     email: data.email,
                     mobile_number: data.mobile_number,
@@ -84,6 +92,10 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
                     ifsc_code: data.ifsc_code,
                     branch_name: data.branch_name,
                     nominee_name: data.nominee_name,
+                    date_of_birth: data.date_of_birth,
+                    pan_number: data.pan_number,
+                    aadhar_number: data.aadhar_number,
+                    relation_with_nominee: data.relation_with_nominee,
                     // account_open_date is usually set on creation, but we can allow edit if needed.
                     // keeping it read-only in UI might be better, but user said "added and manipulated", so let's allow edit.
                     account_open_date: data.account_open_date
@@ -138,8 +150,26 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
                     </div>
 
                     <div className="grid gap-2">
+                        <Label>Account Number *</Label>
+                        <Input
+                            {...register('account_number', { required: true })}
+                            className="font-mono"
+                            placeholder="Account Number"
+                        />
+                    </div>
+
+                    <div className="grid gap-2">
                         <Label>Full Name</Label>
                         <Input {...register('account_holder_name')} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label>Customer ID *</Label>
+                        <Input
+                            {...register('customer_id', { required: true })}
+                            className="font-mono"
+                            placeholder="Customer ID"
+                        />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -216,12 +246,47 @@ export function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: Edit
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <Label>Nominee Name</Label>
-                            <Input {...register('nominee_name')} />
+                            <Label>Date of Birth</Label>
+                            <Input type="date" {...register('date_of_birth')} />
                         </div>
                         <div className="grid gap-2">
                             <Label>Account Open Date</Label>
                             <Input type="date" {...register('account_open_date')} />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label>PAN Number</Label>
+                            <Input
+                                {...register('pan_number')}
+                                className="font-mono uppercase"
+                                placeholder="ABCDE1234F"
+                                maxLength={10}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Aadhar Number</Label>
+                            <Input
+                                {...register('aadhar_number')}
+                                className="font-mono"
+                                placeholder="1234 5678 9012"
+                                maxLength={12}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label>Nominee Name</Label>
+                            <Input {...register('nominee_name')} />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label>Relation with Nominee</Label>
+                            <Input
+                                {...register('relation_with_nominee')}
+                                placeholder="e.g., Spouse, Child, Parent"
+                            />
                         </div>
                     </div>
 

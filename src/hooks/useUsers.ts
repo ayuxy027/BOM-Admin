@@ -61,6 +61,7 @@ export function useUsers() {
                     account_open_date: d?.account_open_date,
                     ifsc_code: d?.ifsc_code || '',
                     branch_name: d?.branch_name || '',
+                    date_of_birth: d?.date_of_birth,
                     pan_number: d?.pan_number || '',
                     aadhar_number: d?.aadhar_number || '',
                     nominee_name: d?.nominee_name || '',

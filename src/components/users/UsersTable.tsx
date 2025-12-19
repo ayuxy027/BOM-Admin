@@ -77,6 +77,8 @@ export function UsersTable({ users, loading, onEditUser, onDeleteUser, deletingU
                 User <SortIcon field="name" />
               </div>
             </TableHead>
+            <TableHead className="hidden lg:table-cell">Account Number</TableHead>
+            <TableHead className="hidden lg:table-cell">Customer ID</TableHead>
             <TableHead>MPIN</TableHead>
             <TableHead className="hidden md:table-cell">Account Type</TableHead>
             <TableHead
@@ -123,6 +125,12 @@ export function UsersTable({ users, loading, onEditUser, onDeleteUser, deletingU
                     <p className="text-sm text-muted-foreground">{user.email || user.mobile_number}</p>
                   </div>
                 </div>
+              </TableCell>
+              <TableCell className="hidden lg:table-cell">
+                <span className="font-mono text-sm">{user.account_number}</span>
+              </TableCell>
+              <TableCell className="hidden lg:table-cell">
+                <span className="font-mono text-sm text-muted-foreground">{user.customer_id}</span>
               </TableCell>
               <TableCell>
                 <span className="font-mono text-sm bg-secondary/50 px-2 py-1 rounded">{user.mpin || '------'}</span>
