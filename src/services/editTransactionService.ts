@@ -30,7 +30,8 @@ import {
     TransactionStatus,
     getDebitCreditValues,
     calculateImpact,
-    calculateImpactLegacy
+    calculateImpactLegacy,
+    getUserInitialBalance
 } from './transactionTypes';
 import { recalculateAllBalances } from './balanceService';
 
@@ -57,14 +58,18 @@ function checkRecalculationNeeded(
         }
     }
 
-    // Type changed?
-    if (updated.transaction_type && updated.transaction_type !== original.transaction_type) {
-        return true;
-    }
+    // Type changed? - REMOVED as per request to avoid unnecessary recalculations
+    // We rely on operation_type for direction. Changing just the label (e.g. IMPS -> NEFT) keeps same impact.
+    // if (updated.transaction_type && updated.transaction_type !== original.transaction_type) {
+    //     return true;
+    // }
 
-    // Amount changed?
-    if (updated.amount !== undefined && updated.amount !== original.amount) {
-        return true;
+    // Amount changed? (Use epsilon for float comparison)
+    if (updated.amount !== undefined) {
+        const diff = Math.abs(updated.amount - original.amount);
+        if (diff > 0.01) { // 1 cent difference triggers update
+            return true;
+        }
     }
 
     // Status changed? (This is the key one often missed!)
@@ -103,6 +108,18 @@ export async function editTransaction(
 
         // Check if recalculation is needed
         const needsRecalculation = checkRecalculationNeeded(original, updates);
+
+        // Calculate true initial balance BEFORE update if we are going to recalculate
+        // This is critical because if we edit the first transaction, getUserInitialBalance (which reads from DB)
+        // will use the NEW amount with the OLD balance_after, leading to wrong initial balance derivation.
+        let trueInitialBalance: number | undefined;
+        if (needsRecalculation) {
+            // We can rely on getUserInitialBalance here because the DB is still in "Original" state
+            // So reverse-calculation (balance_after - amount) will be correct.
+            // UNLESS the transaction being edited IS the first one, but getUserInitialBalance handles finding the first one.
+            // Since we haven't touched DB yet, it finds the original first one and calculates correctly.
+            trueInitialBalance = await getUserInitialBalance(original.user_id);
+        }
 
         // Build the update object
         const updateData: any = {};
@@ -158,8 +175,8 @@ export async function editTransaction(
 
         // Recalculate balances if needed
         let newUserBalance: number | undefined;
-        if (needsRecalculation) {
-            const result = await recalculateAllBalances(original.user_id);
+        if (needsRecalculation && trueInitialBalance !== undefined) { // Check trueInitialBalance exists to satisfy TS
+            const result = await recalculateAllBalances(original.user_id, trueInitialBalance);
             newUserBalance = result.newBalance;
         }
 

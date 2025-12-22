@@ -107,8 +107,14 @@ export async function getBalanceBeforePosition(
  *    - Set balance_after = running balance
  * 4. Update user's final balance
  */
-export async function recalculateAllBalances(userId: string): Promise<BalanceCalculationResult> {
-    const initialBalance = await getUserInitialBalance(userId);
+export async function recalculateAllBalances(userId: string, initialBalanceOverride?: number): Promise<BalanceCalculationResult> {
+    let initialBalance: number;
+    if (initialBalanceOverride !== undefined) {
+        initialBalance = initialBalanceOverride;
+    } else {
+        initialBalance = await getUserInitialBalance(userId);
+    }
+
     const transactions = await getOrderedTransactions(userId);
 
     if (transactions.length === 0) {
@@ -127,13 +133,26 @@ export async function recalculateAllBalances(userId: string): Promise<BalanceCal
 
     // Recalculate balance for each transaction
     for (const txn of transactions) {
+        // Check explicit debit/credit columns first (Source of Truth)
+        let impact = 0;
+
+        if (txn.credit && txn.credit > 0) {
+            impact = txn.credit;
+        } else if (txn.debit && txn.debit > 0) {
+            impact = -txn.debit;
+        } else {
+            // Fallback to legacy calc if columns are missing
+            impact = calculateImpactLegacy(
+                txn.amount,
+                txn.transaction_type as TransactionType,
+                txn.status as TransactionStatus
+            );
+        }
+
         // Only apply impact if status is 'success'
-        // Use legacy calculation for backwards compatibility
-        const impact = calculateImpactLegacy(
-            txn.amount,
-            txn.transaction_type as TransactionType,
-            txn.status as TransactionStatus
-        );
+        if (txn.status !== 'success') {
+            impact = 0;
+        }
 
         runningBalance += impact;
 

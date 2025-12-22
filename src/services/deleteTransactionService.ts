@@ -26,7 +26,8 @@ import { supabase } from '@/integrations/supabase/client';
 import {
     TransactionType,
     TransactionStatus,
-    calculateImpact,
+    calculateImpactLegacy,
+    getUserInitialBalance,
     shouldImpactBalance
 } from './transactionTypes';
 import { recalculateAllBalances } from './balanceService';
@@ -38,15 +39,6 @@ export interface DeleteTransactionResult {
     error?: string;
 }
 
-/**
- * Delete a transaction and recalculate all balances
- * 
- * Process:
- * 1. Fetch the transaction to get user_id and calculate impact
- * 2. Delete the transaction
- * 3. Recalculate all remaining balances
- * 4. Return the impact and new user balance
- */
 export async function deleteTransaction(transactionId: string): Promise<DeleteTransactionResult> {
     try {
         // Fetch the transaction first to get user_id and calculate impact
@@ -65,13 +57,34 @@ export async function deleteTransaction(transactionId: string): Promise<DeleteTr
         }
 
         const userId = transaction.user_id;
+
+        // Capture the true initial balance BEFORE we delete anything.
+        // If this is the only transaction, getUserInitialBalance will correctly reverse-calculate 
+        // the opening balance from this transaction.
+        // If we wait until after delete, it will find 0 transactions and default to current (wrong) balance.
+        const trueInitialBalance = await getUserInitialBalance(userId);
+
         const type = transaction.transaction_type as TransactionType;
         const status = transaction.status as TransactionStatus;
         const amount = transaction.amount;
 
         // Calculate the impact this transaction HAD on the balance
+        // We prioritize the explicit debit/credit columns
+        let originalImpact = 0;
+        if (transaction.credit && transaction.credit > 0) {
+            originalImpact = transaction.credit;
+        } else if (transaction.debit && transaction.debit > 0) {
+            originalImpact = -transaction.debit;
+        } else {
+            originalImpact = calculateImpactLegacy(amount, type, status);
+        }
+
+        // Ensure failed transactions don't count
+        if (status !== 'success') {
+            originalImpact = 0;
+        }
+
         // When we delete it, the opposite will happen
-        const originalImpact = calculateImpact(amount, type, status);
         const balanceImpact = -originalImpact; // Reverse the impact
 
         // Delete the transaction
@@ -88,8 +101,8 @@ export async function deleteTransaction(transactionId: string): Promise<DeleteTr
             };
         }
 
-        // Recalculate all remaining balances for this user
-        const result = await recalculateAllBalances(userId);
+        // Recalculate all remaining balances for this user, providing the override
+        const result = await recalculateAllBalances(userId, trueInitialBalance);
 
         // Note: If the deleted transaction's status was not 'success',
         // balanceImpact will be 0 (which is correct - no balance change)
@@ -145,7 +158,7 @@ export async function deleteTransactions(transactionIds: string[]): Promise<{
 
     // Calculate total impact
     for (const tx of transactions) {
-        const impact = calculateImpact(
+        const impact = calculateImpactLegacy(
             tx.amount,
             tx.transaction_type as TransactionType,
             tx.status as TransactionStatus
@@ -199,7 +212,7 @@ export async function previewDeleteImpact(transactionId: string): Promise<{
 }> {
     const { data: transaction, error } = await supabase
         .from('user_transactions')
-        .select('transaction_date, transaction_type, amount, status')
+        .select('transaction_date, transaction_type, amount, status, debit, credit')
         .eq('id', transactionId)
         .single();
 
@@ -213,7 +226,21 @@ export async function previewDeleteImpact(transactionId: string): Promise<{
 
     const type = transaction.transaction_type as TransactionType;
     const status = transaction.status as TransactionStatus;
-    const impact = calculateImpact(transaction.amount, type, status);
+
+    // Calculate impact using columns if available
+    let impact = 0;
+    if (transaction.credit && transaction.credit > 0) {
+        impact = transaction.credit;
+    } else if (transaction.debit && transaction.debit > 0) {
+        impact = -transaction.debit;
+    } else {
+        impact = calculateImpactLegacy(transaction.amount, type, status);
+    }
+
+    // Ensure failed transactions don't count
+    if (status !== 'success') {
+        impact = 0;
+    }
 
     return {
         transaction: {

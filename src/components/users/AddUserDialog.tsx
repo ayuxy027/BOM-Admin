@@ -168,8 +168,8 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
                             <input type="hidden" {...register('account_type')} defaultValue="SAVINGS" />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="balance">Balance <span className="text-destructive">*</span></Label>
-                            <Input id="balance" type="number" step="0.01" {...register('balance', { required: true })} />
+                            <Label htmlFor="balance">Opening Balance <span className="text-destructive">*</span></Label>
+                            <Input id="balance" type="number" step="0.01" {...register('balance', { required: "Opening Balance is required" })} />
                         </div>
                     </div>
 
@@ -228,8 +228,8 @@ export function AddUserDialog({ open, onOpenChange, onUserAdded, children }: Add
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="date_of_birth">Date of Birth</Label>
-                            <Input id="date_of_birth" type="date" {...register('date_of_birth')} />
+                            <Label htmlFor="date_of_birth">Date of Birth <span className="text-destructive">*</span></Label>
+                            <Input id="date_of_birth" type="date" {...register('date_of_birth', { required: "Date of Birth is required" })} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="account_open_date">Account Open Date <span className="text-destructive">*</span></Label>

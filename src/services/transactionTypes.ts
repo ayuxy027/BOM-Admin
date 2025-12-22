@@ -220,7 +220,7 @@ export async function getUserInitialBalance(userId: string): Promise<number> {
     // Get the first transaction for this user
     const { data: firstTx, error: txError } = await supabase
         .from('user_transactions')
-        .select('balance_after, amount, transaction_type, status')
+        .select('balance_after, amount, transaction_type, status, debit, credit')
         .eq('user_id', userId)
         .order('transaction_date', { ascending: true })
         .order('transaction_time', { ascending: true })
@@ -240,7 +240,19 @@ export async function getUserInitialBalance(userId: string): Promise<number> {
     }
 
     // Reverse calculate initial balance from first transaction
-    // If first tx added +500, and balance_after was 10500, initial was 10000
-    const impact = calculateImpact(firstTx.amount, firstTx.transaction_type as TransactionType, firstTx.status as TransactionStatus);
+    // Use explicit columns if available, otherwise legacy type-based calc
+    let impact = 0;
+    if (firstTx.credit && firstTx.credit > 0) {
+        impact = firstTx.credit;
+    } else if (firstTx.debit && firstTx.debit > 0) {
+        impact = -firstTx.debit;
+    } else {
+        impact = calculateImpactLegacy(
+            firstTx.amount,
+            firstTx.transaction_type as TransactionType,
+            firstTx.status as TransactionStatus
+        );
+    }
+
     return (firstTx.balance_after || 0) - impact;
 }
